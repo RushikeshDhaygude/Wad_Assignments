@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 4px 8px gray;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        input[type="button"] {
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: azure;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        input[type="button"]:active {
+            background-color: #3e8e41;
+        }
+    </style>
+    <script>
+        $(document).ready(function(){
+            $("submitBtn").click(function(){
+                var name = $("#name").val();
+                var email = $("email").val();
+                var website = $("website").val();
+
+                if(name == '' || email == ''|| website == ''){
+                    alert("All details are Compulsory..");
+                }
+
+                var userData = {
+                    name: name,
+                    email: email,
+                    website: website
+                };
+
+                var users = JSON.parse(localStorage.getItem('users')) || [];
+
+                users.push(userData);
+                localStorage.setItem('users',JSON.stringify(users));
+
+                alert('User Registered Successfully..!!');
+                window.location.href = "user_list.html"
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <div class="card">
+        <h2 style="display: block; text-align: center;">User Registration Form</h2>
+        <form>
+            <label for="name">Name</label><br>
+            <input type="text" id="name" name="name"><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email"><br>
+            <label for="name">Website</label><br>
+            <input type="text" id="website" name="website"><br>
+            <input type="button" value="register" id="submitBtn">
+        </form>
+</body>
+
+</html>
