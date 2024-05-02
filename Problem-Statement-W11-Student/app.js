@@ -1,128 +1,123 @@
-const express = require('express')
-const bodyparser = require('body-parser')
-const path = require('path')
-const mongoose = require('mongoose')
-const Student = require('./models')
-const dbConfig = require('./config')
+const path = require("path");
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const Student = require("./models");
+const dbConfig = require("./config");
 
 const app = express();
+app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-app.set("view engine", "ejs")
+mongoose
+  .connect(dbConfig.url)
+  .then(() => {
+    console.log("Successfully connected to the database");
+  })
+  .catch(() => {
+    console.log("Could not connect to database", err);
+    process.exit();
+  });
 
-app.use(bodyparser.urlencoded({extended: true}))
-app.use(bodyparser.json())
+app.use("/css", express.static(path.resolve(__dirname, "static/css")));
 
-mongoose.connect(dbConfig.url)
-.then(()=>{
-    console.log('DB connected Successfully!')
-})
-.catch((err)=>{
-    console.log('Erro in DB connection, ', err);
-})
+app.get("/", (req, res) => {
+  Student.find()
+    .then((student) => {
+      res.render("index", { student: student });
+    })
+    .catch((err) => {
+      res.status(500).send("Error fetching student data");
+    });
+});
 
-app.listen(3000, ()=>{
-    console.log('Server listening on PORT 3000')
-})
+app.post("/addmarks", (req, res) => {
+  var myData = new Student(req.body);
+  myData
+    .save()
+    .then((item) => {
+      console.log("item saved to database");
+      res.redirect("/getMarks");
+    })
+    .catch((err) => {
+      res.status(400).send("unable to save to database");
+    });
+});
 
-app.use("/css", express.static(path.resolve(__dirname, "static/css")))
+app.get("/getMarks", (req, res) => {
+  console.log(req.query);
+  Student.find(req.query)
+    .then((student) => {
+      res.render("table", { student: student });
+    })
+    .catch((err) => {
+      res.json({ message: "err" });
+    });
+});
 
-// home page
-app.get("/", (req,res)=>{
-    Student.find()
-    .then((student)=>{
-        res.render("index", {student: student})
+app.get("/dsbdaGreaterThan20", (req, res) => {
+  Student.find({ dsbda_marks: { $gt: 20 } })
+    .then((student) => {
+      res.render("table", { student: student });
     })
-    .catch((err)=>{
-        res.status(500).send("Error Opening Home Page");
-    })
-})
+    .catch((err) => {
+      res.json({ message: "err" });
+    });
+});
 
-// add marks
-app.post("/addmarks", (req,res)=>{
-    const data = new Student(req.body)
-    console.log('here')
-    data.save()
-    .then(()=>{
-        res.redirect("/getmarks")
+app.get("/allgreaterthan25", (req, res) => {
+  Student.find({ wad_marks: { $gt: 25 }, cc_marks: { $gt: 25 }, dsbda_marks: { $gt: 25 }, cns_marks: { $gt: 25 }, ai_marks:{ $gt: 25 } })
+    .then((student) => {
+      res.render("table", { student: student });
     })
-    .catch((err)=>{
-        res.json('error in adding marks', {message: err})
-    })
-})
+    .catch((err) => {
+      res.json({ message: "err" });
+    });
+});
 
-// getmarks
-app.get("/getmarks", (req,res)=>{
-    Student.find(req.query)
-    .then((student)=>{
-        res.render("table", {student: student})
+app.get("/below40WadCc", (req, res) => {
+  Student.find({ wad_marks: { $lt: 40 }, cc_marks: { $lt: 40 } })
+    .then((student) => {
+      res.render("table", { student: student });
     })
-    .catch((err)=>{
-        res.json('error in getting marks', {message: err})
-    })
-})
+    .catch((err) => {
+      console.error("Error fetching students:", err);
+      res.status(500).json({ error: "Error fetching students" });
+    });
+});
 
-//dsbda greater than 20
-app.get("/dsbdagt20", (req,res)=>{
-    Student.find({dsbda_marks: { $gt : 20} })
-    .then((student)=>{
-        res.render("table", {student: student})
-    })
-    .catch((err)=>{
-        res.json('error in getting marks of dsbda', {message: err})
-    })
-})
 
-// all greater than 25
-app.get("/allgreaterthan25", (req,res)=>{
-    Student.find({dsbda_marks: { $gt : 25}, cc_marks: { $gt : 25}, cns_marks: { $gt : 25}, wad_marks: { $gt : 25}})
-    .then((student)=>{
-        res.render("table", {student: student})
-    })
-    .catch((err)=>{
-        res.json('error in getting marks greater than 25', {message: err})
-    })
-})
+app.post("/deleteStudent/:id", (req, res) => {
+  Student.findByIdAndDelete(req.params.id).then((student) => {
+    console.log("Deleted Successfully");
+    res.redirect("/getMarks");
+  });
+});
 
-// lesser than 40
-app.get("/below20inwadcc", (req,res)=>{
-    Student.find({wad_marks: { $lt : 20} }, {cc_marks: { $lt : 20} })
-    .then((student)=>{
-        res.render("table", {student: student})
-    })
-    .catch((err)=>{
-        res.json('error in getting marks below 20', {message: err})
-    })
-})
+app.post("/updateMarks/:id", (req, res) => {
+  const id = req.params.id;
+  const { updatedWadMarks, updatedDsbdaMarks, updatedCnsMarks, updatedCcMarks, updatedAiMarks } = req.body;
 
-//delete student
-app.post("/deletestudent/:id", (req,res)=>{
-    Student.findByIdAndDelete(req.params.id)
-    .then(()=>{
-        res.redirect("/getmarks")
+  Student.findByIdAndUpdate(id, { 
+    $set: {
+      wad_marks: updatedWadMarks,
+      dsbda_marks: updatedDsbdaMarks,
+      cns_marks: updatedCnsMarks,
+      cc_marks: updatedCcMarks,
+      ai_marks: updatedAiMarks
+    }
+  }, { new: true })
+    .then((updatedStudent) => {
+      console.log("Marks updated successfully");
+      res.redirect("/getMarks");
     })
-    .catch((err)=>{
-        res.json('error in deleting student', {message: err})
-    })
-})
+    .catch((err) => {
+      console.error("Error updating marks:", err);
+      res.status(500).send("Error updating marks");
+    });
+});
 
-// update student
-app.post("/updatestudent/:id", (req,res)=>{
-    const id = req.params.id;
-    const {updatedcc, updateddsbda, updatedwad, updatedcns} = req.body;
-    // const { updatedcc, updateddsbda, updatedwad, updatedcns } = req.body;
-
-    Student.findByIdAndUpdate(id, {
-        $set:{
-            wad_marks: updatedwad,
-            cc_marks: updatedcc,
-            cns_marks: updatedcns,
-            dsbda_marks: updateddsbda
-        }
-    },{new: true})
-    .then(()=>{
-        res.redirect("/getmarks")
-    })
-    .catch((err)=>{
-        res.json('error in updating marks', {message: err})
-    })
-})
+app.listen(3000, () => {
+  console.log("Server is listening on port 3000");
+});

@@ -1,28 +1,4 @@
-<html>
-    <head>
-        <title>Student Management</title>
-        <link rel="stylesheet" type="text/css" href="/css/index.css">
-    </head>
-    <body>
-        <div class="row">
-            <div>
-                <form mathod="POST" action="/addmarks" class="details-form">
-                    <h3>Enter Student Details</h3>
-                    <input type="text" name="name" placeholder="Enter Student Name" required>
-                    <input type="text" name="roll_no" placeholder="Enter Student Roll Number" required>
-                    <input type="number" name="wad_marks" placeholder="Enter WAD Marks" required>
-                    <input type="number" name="cc_marks" placeholder="Enter CC Marks" required>
-                    <input type="number" name="dsbda_marks" placeholder="Enter DSBDA Marks" required>
-                    <input type="number" name="cns_marks" placeholder="Enter CNS marks" required>
-                    <input type="submit" value="Save" class="btn">
-                </form>
-            </div>
-        </div>
-    </body>
-</html>
-
-
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Intro to Node and MongoDB</title>
@@ -41,7 +17,7 @@
           />
           <input
             type="number"
-            name="roll_no"
+            name="rollno"
             placeholder="Enter Roll no"
             required
           />
@@ -49,12 +25,6 @@
             type="text"
             name="wad_marks"
             placeholder="Enter WAD marks"
-            required
-          />
-          <input
-            type="number"
-            name="cc_marks"
-            placeholder="Enter CC marks"
             required
           />
           <input
@@ -69,9 +39,21 @@
             placeholder="Enter CNS marks"
             required
           />
+          <input
+            type="number"
+            name="cc_marks"
+            placeholder="Enter CS marks"
+            required
+          />
+          <input
+            type="number"
+            name="ai_marks"
+            placeholder="Enter AI marks"
+            required
+          />
           <input type="submit" value="Save" class="btn" />
         </form>
       </div>
     </div>
   </body>
-</html> -->
+</html>
