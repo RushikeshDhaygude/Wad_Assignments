@@ -30,5 +30,4 @@ https://login.salesforce.com/
 
 https://developer.salesforce.com/signup
 
-Id: i2k22230@pict.edu
-pass :- Sjpv@5555
+Id: rushikeshpict-ygn1@force.com
