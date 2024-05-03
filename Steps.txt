@@ -7,6 +7,11 @@ Cloud
 	5)sudo systemcrl status ssh
 	6) scp myfile.txt (reciver_usernname)@(reciever_ip):/download/
 
+
+	1) ifconfig
+	2) sudo apt install openssh-server
+	3) scp abc.txt rushi@10.0.2.4: 
+	
 	password of reciver
 
 2)  jyala file denar
